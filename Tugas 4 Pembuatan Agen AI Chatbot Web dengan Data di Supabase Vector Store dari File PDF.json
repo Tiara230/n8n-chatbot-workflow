@@ -1,0 +1,308 @@
+{
+  "name": "Tugas 4 Pembuatan Agen AI Chatbot Web dengan Data di Supabase Vector Store dari File PDF",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "8cde680f-dc12-46af-9e86-137436f74648",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        240
+      ],
+      "id": "e4aa91b8-8d1b-47ad-afb3-d2965e5dde82",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        0
+      ],
+      "id": "958be01d-8ffc-49c4-be1d-a83d33c29e34",
+      "name": "Supabase Vector Store",
+      "notesInFlow": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "dq5BDruLxtdHTtMp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1he5idmRUhjT0IrYdw_LXEflkIavdO0CU",
+          "mode": "list",
+          "cachedResultName": "Panduan Penulisan Ilmiah Tugas Akhir Skripsi.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1he5idmRUhjT0IrYdw_LXEflkIavdO0CU/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "9e39bb45-3cf9-4e0f-9610-0236e3aea71c",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Y5EeOGUdvn5Fq2aG",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        576,
+        256
+      ],
+      "id": "0cedcf90-cec3-4e97-a6dd-472a049e13cf",
+      "name": "Embeddings Google Gemini",
+      "executeOnce": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "mwpRn6ViIqK4YzxT",
+          "name": "Google Gemini Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah asisten AI yang membantu mahasiswa dalam memahami dan menyusun penulisan ilmiah tugas akhir skripsi berdasarkan dokumen panduan yang tersedia di database (Supabase Vector Store). Tugas kamu adalah menjawab pertanyaan secara jelas, sistematis, dan mudah dipahami, mencakup topik seperti struktur skripsi, penulisan Bab I–V, metodologi penelitian, kajian literatur, analisis, kesimpulan, serta format penulisan ilmiah.\n\nJawaban harus selalu berdasarkan informasi dari dokumen dan tidak boleh mengarang. Jika informasi tidak ditemukan, jawab: \"Maaf, informasi tersebut tidak ditemukan dalam dokumen panduan.\" Gunakan bahasa Indonesia yang formal, jelas, dan jika memungkinkan, sajikan dalam bentuk poin agar lebih terstruktur."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        528,
+        448
+      ],
+      "id": "64b3f603-8109-4fa1-9a2b-235b301dc17a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        480,
+        656
+      ],
+      "id": "151008d0-b61f-4611-81fb-51c91a6a21cc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "mwpRn6ViIqK4YzxT",
+          "name": "Google Gemini Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Panggil Tool Supabase Vector Store ini untuk mendapatkan informasi panduan menulis bab 1 tulisan ilmiah",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        624
+      ],
+      "id": "de58e529-38e6-4e3a-8794-f106af3cba13",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "dq5BDruLxtdHTtMp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! 👋\nAku AI Assistant yang siap membantu kamu memahami penulisan skripsi 📚\n\nMau tanya tentang BAB, metodologi, atau cara bikin skripsi yang benar? Langsung aja ya! 😊\n",
+        "options": {
+          "title": "AI Skripsi 🤖 \n Asisten Penulisan Ilmiah"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        144,
+        416
+      ],
+      "id": "77854d12-c614-43a1-9de5-458a46840c19",
+      "name": "When chat message received",
+      "webhookId": "17ae095d-fa06-4f3c-b38b-19a697e68ff2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        656
+      ],
+      "id": "cd417873-37d4-4d4d-b45d-5cbb6120933f",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "68FlrRgHqgDpk2Lt",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3ce05661-eab5-4932-91f2-d32eb0138586",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e0b4f724eba39d02658f2e270caf1a994e17f3af49f4649394e158550ecfffb"
+  },
+  "id": "YjlAFgzDqj6ktH2l",
+  "tags": []
+}
